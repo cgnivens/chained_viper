@@ -135,3 +135,8 @@ def test_nth(range_iterator):
 
 def test_all(test_iterator):
     assert test_iterator.all_(bool)
+
+
+
+def test_any(test_iterator):
+    assert test_iterator.any(bool)
