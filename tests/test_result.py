@@ -1,4 +1,4 @@
-from functional_python.result import Result
+from chained_viper import Result
 import pytest
 
 

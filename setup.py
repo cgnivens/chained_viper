@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='snakeskin',
+    name='chained-viper',
     version='0.0.1',
     license='BSD-2-Clause',
     description='Functional syntax for python including iteration, result, and option.',
@@ -32,7 +32,7 @@ setup(
     ),
     author='Cory Nivens',
     author_email='',
-    url='https://github.com/cgnivens/snakeskin',
+    url='https://github.com/cgnivens/chained-viper',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -62,8 +62,8 @@ setup(
         'Topic :: Utilities',
     ],
     project_urls={
-        'Changelog': 'https://github.com/cgnivens/snakeskin/blob/master/CHANGELOG.rst',
-        'Issue Tracker': 'https://github.com/cgnivens/snakeskin/issues',
+        'Changelog': 'https://github.com/cgnivens/chained-viper/blob/master/CHANGELOG.rst',
+        'Issue Tracker': 'https://github.com/cgnivens/chained-viper/issues',
     },
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
@@ -82,7 +82,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'functional_python = functional_python.cli:main',
+            'chained_viper = chained_viper.cli:main',
         ]
     },
 )
