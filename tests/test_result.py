@@ -2,5 +2,5 @@ from chained_viper import Result
 import pytest
 
 
-def sanity_check():
+def test_sanity():
     assert True
