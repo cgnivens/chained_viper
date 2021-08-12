@@ -23,6 +23,11 @@ class Result:
             self.err_type = None
 
 
+    def __str__(self):
+        type_ = "Ok" if self.is_ok() else "Err"
+        return f"Result.{type_}({self.value})"
+
+
     def map(self, key):
         if not self.is_ok():
             return Result(self.value)
@@ -75,11 +80,11 @@ class Result:
 
 
     def is_ok(self):
-        return bool(self.err_type)
+        return not bool(self.err_type)
 
 
     def is_err(self):
-        return not bool(self.err_type)
+        return bool(self.err_type)
 
 
     def ok(self):
@@ -256,7 +261,7 @@ class Option:
 
 
     def map_or(self, f: Callable, default):
-        return Option(f(self.value)) if self.is_some() else default
+        return Option(f(self.value) if self.is_some() else default)
 
 
     def map_or_else(self, f: Callable, default: Callable):
