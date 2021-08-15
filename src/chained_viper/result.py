@@ -68,23 +68,25 @@ class Result:
             return Result(val)
 
 
-    def map_or_else(self, f, default: Callable):
+    # TODO: I think this should actually unwrap
+    # and return a non-Result. Not sure about this one though
+    def map_or_else(self, f: Callable, default: Callable):
         if not self.is_ok():
-            yield Result(default(self.value))
+            return Result(default(self.value))
 
         try:
             val = f(self.value)
         except Exception as e:
             val = type(e)(self.value)
         finally:
-            yield Result(val)
+            return Result(val)
 
 
     def map_err(self, f: Callable):
         if not self.is_ok():
             return Result(f(self.value))
         else:
-            return Result(self.err_type(self.value))
+            return self
 
 
     def unwrap(self):
@@ -112,9 +114,12 @@ class Result:
 
     def iter_(self):
         if not self.is_ok():
-            yield
+            return Iter([])
         else:
-            yield from Iter(iter(self.value))
+            try:
+                return Iter(iter(self.value))
+            except:
+                return Iter((self.value,))
 
 
     def and_(self, other):
