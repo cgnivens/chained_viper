@@ -1,6 +1,7 @@
 from typing import Callable, Union, Any, Iterator, Generator, Tuple, TypeVar, Container
 from enum import Enum
 from copy import deepcopy
+import sys
 from .utils import consume
 from itertools import islice
 from functools import partial, reduce
@@ -24,9 +25,27 @@ class Result:
         return f"Result.{type_}({self.value})"
 
 
-    def map(self, key):
+
+    def __eq__(self, other):
+        return self.value == other.value and self.err_type is other.err_type
+
+
+    @classmethod
+    def into(cls, f: Callable):
+        """
+        Maybe we want to transform a closure into a Result
+        """
+        try:
+            val = f()
+        except Exception as e:
+            val = e
+        finally:
+            return Result(val)
+
+
+    def map(self, key: Callable):
         if not self.is_ok():
-            return Result(self.value)
+            return Result(self.err_type(self.value))
 
         # gross! still working this out
         try:
@@ -65,7 +84,7 @@ class Result:
         if not self.is_ok():
             return Result(f(self.value))
         else:
-            return Result(self.value)
+            return Result(self.err_type(self.value))
 
 
     def unwrap(self):

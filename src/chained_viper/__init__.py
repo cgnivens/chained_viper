@@ -7,7 +7,7 @@ from . import result
 from . import option
 
 """
-This is a ridiculous circular import hack, but I don't want
+This is a circular import hack, but I don't want
 to stare at a 700+ line file with everything in it
 """
 
