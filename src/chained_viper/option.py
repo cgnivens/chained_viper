@@ -26,20 +26,11 @@ class Option:
 
 
     def __eq__(self, other):
-        # print(f"self: {self} other: {other}")
-        # print(self)
-        # print(self.value)
-        # print(other)
-        # print(other.value)
         return self.value == other.value
 
 
     def __str__(self):
         return f'Option.Some({self.value})'
-
-
-    def __iter__(self):
-        return iter(self.value) if hasattr(self.value, '__iter__') else iter(self.value, )
 
 
     def unwrap(self):
@@ -139,7 +130,7 @@ class Option:
         if self.is_none():
             return Option(None)
         else:
-            return Option(next(filter(predicate, (self.value,))))
+            return Option(next(filter(predicate, (self.value,)), None))
 
 
     def or_(self, other):
