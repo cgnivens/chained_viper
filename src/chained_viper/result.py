@@ -27,7 +27,8 @@ class Result:
 
 
     def __eq__(self, other):
-        return self.value == other.value and self.err_type is other.err_type
+        return (self.value == other.value
+            and self.err_type is other.err_type)
 
 
     @classmethod
