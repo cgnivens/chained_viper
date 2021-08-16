@@ -56,3 +56,30 @@ Option(None).ok_or(Exception("Bad value")) == Result(Exception("Bad value"))
 
 Option(1).iter().next() == Option(1)
 ```
+
+### Lazy Options
+For truly lazy options, use the `Option.iter()` method to change it into an iterator over the wrapped value. For non-iterable values such as `int`, `bool`, `float`, etc, this will result in a single-element iterator over `(value, )`. Otherwise, it will iterate over the wrapped value itself. However, applying functions through `map`s and `filter`s will be truly lazy and will not be called until `.next`, `.peek`, or `.collect` is called on the iterator:
+
+```python
+from time import sleep
+from chained_viper import Option
+
+def f(x):
+    print("Some long function call")
+    sleep(5)
+    x += 1
+    print("Modified x")
+    sleep(3)
+    return x
+
+
+
+my_iter = Option(5).iter().map(f)
+
+new_value = my_iter.next()
+Some long function call
+Modified x
+
+assert new_value == Option(6)
+```
+Otherwise, `Option.map`/`Option.filter`/... is greedy, and will evaluate immediately.
