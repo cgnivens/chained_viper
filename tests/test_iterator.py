@@ -117,8 +117,16 @@ def test_find_map(range_iterator):
 
 
 def test_peek(range_iterator):
-    assert range_iterator.peek().unwrap() == 0
-    assert range_iterator.next().unwrap() == 0
+    peekable_iter = range_iterator.peekable()
+    assert peekable_iter.peek().unwrap() == 0
+    assert peekable_iter.next().unwrap() == 0
+
+    _ = peekable_iter.count() # consume
+    assert peekable_iter.peek().is_none()
+    assert peekable_iter.next().is_none()
+
+    with pytest.raises(NotImplementedError):
+        range_iterator.peek()
 
 
 def test_nth(range_iterator):
