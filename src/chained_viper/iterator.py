@@ -5,6 +5,7 @@ from copy import deepcopy
 from .utils import consume
 from itertools import islice
 from functools import partial, reduce
+from collections import deque
 
 
 T = TypeVar('T')
@@ -151,7 +152,7 @@ class Iter:
     def step_by(self, n) -> Iter:
         def stepper(n):
             for i, item in enumerate(self):
-                if not i % n:
+                if not i % n or not i:
                     yield item.value
 
 
@@ -170,16 +171,14 @@ class Iter:
 
 
     def peek(self) -> Option:
-        def plain_iterator(val, self):
-            yield val.unwrap()
-            yield from (item.value for item in self)
+        raise NotImplementedError(
+            "Iterator is not peekable. Use `Iter.peekable()` to enable the"
+            " `Iter.peek()` method"
+        )
 
-        val = self.next()
 
-        if val.is_some():
-            self.iter_ = plain_iterator(val, self)
-
-        return val
+    def peekable(self):
+        return PeekableIter(self)
 
 
     def skip_while(self, f: Callable) -> Iter:
@@ -216,3 +215,37 @@ class Iter:
 
     def fold(self, initial_value: T, f: Callable) -> T:
         return reduce(initial_value, (f(item.unwrap()) for item in self))
+
+
+
+
+class PeekableIter(Iter):
+    def __init__(self, iterator):
+        super().__init__(iterator)
+        self._cache = deque()
+
+
+    def __next__(self):
+        if self._cache:
+            return self._cache.pop()
+        else:
+            return super().__next__()
+
+
+    def next(self):
+        if self._cache:
+            return self._cache.pop()
+        else:
+            return super().next()
+
+
+    def peek(self):
+        if self._cache:
+            return self._cache[-1]
+        else:
+            val = self.next()
+
+        if val.is_some():
+            self._cache.appendleft(val)
+
+        return val
