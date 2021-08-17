@@ -109,13 +109,13 @@ def test_err(ok, err):
 
 
 def test_iter():
-    iterator = Result('abc').iter_()
+    iterator = Result('abc').iter()
     assert iterator.next() == Option('a')
 
-    iterator = Result(True).iter_()
+    iterator = Result(True).iter()
     assert iterator.next() == Option(True)
 
-    iterator = Result([]).iter_()
+    iterator = Result([]).iter()
     assert iterator.next() == Option(None)
 
 

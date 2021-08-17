@@ -196,7 +196,7 @@ class Result:
         return Option(self.value) if not self.is_ok() else Option(None)
 
 
-    def iter_(self):
+    def iter(self):
         """
         Iterates over the contents of an Ok[T] if supported, otherwise
         creates an iterator over a single element tuple of Ok[T]. If
