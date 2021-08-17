@@ -73,9 +73,10 @@ def f(x):
     return x
 
 
-
+# function not applied here
 my_iter = Option(5).iter().map(f)
 
+# but it is applied here
 new_value = my_iter.next()
 Some long function call
 Modified x
