@@ -72,10 +72,10 @@ def test_map_or():
 
 def test_map_or_else():
     r = Result(1).map_or_else(lambda x: x + 1, lambda x: 42)
-    assert r == Result(2)
+    assert r == 2
 
     r = Result(Exception(1)).map_or_else(lambda x: x + 1, lambda x: 42)
-    assert r == Result(42)
+    assert r == 42
 
 
 def test_map_err(ok, err):
@@ -83,7 +83,7 @@ def test_map_err(ok, err):
     assert r == ok
 
     r = err.map_err(lambda x: len(x))
-    assert r == Result(3)
+    assert r == Result(Exception(3))
 
 
 
