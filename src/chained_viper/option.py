@@ -398,18 +398,46 @@ class Option:
 
 
     def take(self):
+        """
+        Strips the value from self and returns a new Option, changing
+        self to a None
+
+            opt = Option(5)
+            assert opt.take() == Option(5)
+
+            # original option is now None
+            assert opt.is_none()
+        """
         new_ = Option(self.value)
         self.value = None
         return new_
 
 
     def replace(self, value):
+        """
+        Replaces self.value with a new value, returning
+        an Option of the original value
+
+            opt = Option(5)
+            assert opt.replace(6) == Option(5)
+
+            assert opt == Option(6)
+        """
         new_ = Option(self.value)
         self.value = value
         return new_
 
 
     def zip(self, other):
+        """
+        Create an Option of a tuple of the two contained values, provided
+        self and other are not None. Otherwise returns Option(None)
+
+            opt1, opt2, opt3 = Option(1), Option(2), Option(None)
+
+            assert opt1.zip(opt2) == Option((1, 2))
+            assert opt1.zip(opt3).is_none()
+        """
         if self.is_none() or other.is_none():
             return Option(None)
         else:
