@@ -6,7 +6,7 @@ from itertools import islice
 from functools import partial, reduce
 """
 Option needs to mimic an Enum of one of two choices:
-    Some(T) => basically not None
+    Some(T) => T is not None
     None => None
 
 It wraps these two with functionality to process the Option
@@ -55,12 +55,10 @@ class Option:
         Checks if the Option is not wrapping None
 
             opt = Option(5)
-            opt.is_some()
-            True
+            assert opt.is_some()
 
             opt = Option(None)
-            opt.is_some()
-            False
+            assert not opt.is_some()
         """
         return self.value is not None
 
@@ -70,12 +68,10 @@ class Option:
         Checks if the Option is wrapping None
 
             opt = Option(5)
-            opt.is_none()
-            False
+            assert not opt.is_none()
 
             opt = Option(None)
-            opt.is_none()
-            True
+            assert opt.is_none()
         """
         return self.value is None
 
@@ -86,8 +82,7 @@ class Option:
         Similar to equivalence checking against another Option
 
             opt = Option(5)
-            opt.contains(5)
-            True
+            assert opt.contains(5)
         """
         return self.value == value if self.is_some() else False
 
@@ -99,8 +94,7 @@ class Option:
         Similar to unwrap except you specify the error message
 
             opt = Option(5).expect("Error!")
-            opt == 5
-            True
+            assert opt == 5
 
             opt = Option(None).expect("Error!")
             Exception:
@@ -119,12 +113,10 @@ class Option:
         unwrapping a None value
 
             opt = Option(5)
-            opt.unwrap_or(42) == 5
-            True
+            assert opt.unwrap_or(42) == 5
 
             opt = Option(None)
-            opt.unwrap_or(42) == 42
-            True
+            assert opt.unwrap_or(42) == 42
 
             # Better than this approach
             try:
@@ -142,12 +134,10 @@ class Option:
         of just unwrapping them.
 
             opt = Option(5)
-            opt.unwrap_or_else(lambda: 42) == 5
-            True
+            assert opt.unwrap_or_else(lambda: 42) == 5
 
             opt = Option(None)
-            opt.unwrap_or_else(lambda: 42) == 42
-            True
+            assert opt.unwrap_or_else(lambda: 42) == 42
 
             # Better than this approach
             try:
@@ -165,8 +155,7 @@ class Option:
 
             f = partial(some_func, a=22)
 
-            Option(None).unwrap_or_else(f) == 23
-            True
+            assert Option(None).unwrap_or_else(f) == 23
         """
         return self.value if self.is_some() else f()
 
@@ -177,12 +166,10 @@ class Option:
         if it is not a None, otherwise returns the Option(None).
 
             opt = Option(5)
-            opt.map(lambda x: x + 1) == Option(6)
-            True
+            assert opt.map(lambda x: x + 1) == Option(6)
 
             opt = Option(None)
-            opt.map(lambda x: x + 1) == Option(None)
-            True
+            assert opt.map(lambda x: x + 1) == Option(None)
 
         These are evaluated greedily. For a more lazy evaluation style,
         use the Option.iter() method to transform it into an iterator:
@@ -200,12 +187,10 @@ class Option:
         not a None, otherwise returns a default value
 
             opt = Option(5)
-            opt.map_or(lambda x: x + 1, 42) == Option(6)
-            True
+            assert opt.map_or(lambda x: x + 1, 42) == Option(6)
 
             opt = Option(None)
-            opt.map_or(lambda x: x + 1, 42) == Option(42)
-            True
+            assert opt.map_or(lambda x: x + 1, 42) == Option(42)
 
         The function is greedily evaluated
         """
@@ -218,12 +203,10 @@ class Option:
         not a None, otherwise calls a default function
 
             opt = Option(5)
-            opt.map_or(lambda x: x + 1, lambda: 42) == Option(6)
-            True
+            assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(6)
 
             opt = Option(None)
-            opt.map_or(lambda x: x + 1, lambda: 42) == Option(42)
-            True
+            assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(42)
 
         The function and default are greedily evaluated
         """
@@ -236,12 +219,10 @@ class Option:
         None into an Err<T>
 
             opt = Option(5)
-            opt.ok_or(Exception("Bad Value")) == Result(5)
-            True
+            assert opt.ok_or(Exception("Bad Value")) == Result(5)
 
             opt = Option(None)
-            opt.ok_or(Exception("Bad Value")) == Result(Exception("Bad Value"))
-            True
+            assert opt.ok_or(Exception("Bad Value")).is_err()
         """
         return Result(self.value if self.is_some() else e)
 
@@ -271,29 +252,25 @@ class Option:
         a single-element iterator is created
 
             my_iter = Option(5).iter()
-            my_iter.next() == Option(5)
-            True
+            assert my_iter.next() == Option(5)
 
             # int isn't iterable, so single-element
             # iterator is exhausted
-            my_iter.next() == Option(None)
+            assert my_iter.next() == Option(None)
 
             # Iterates over each element in the string
             my_iter = Option("hello").iter()
-            my_iter.next() == Option("h")
-            True
+            assert my_iter.next() == Option("h")
 
         Useful for lazily applying a function to a value in an Option.
         If you want a single-element iterator of iterable types, wrap
         into a single-element tuple:
 
             my_iter = Option(('hello',)).iter()
-            my_iter.next() == Option("hello")
-            True
+            assert my_iter.next() == Option("hello")
 
             # Iterator is now empty
-            my_iter.next().is_none()
-            True
+            assert my_iter.next().is_none()
         """
         if hasattr(self.value, '__iter__'):
             return Iter(iter(self.value))
@@ -308,14 +285,11 @@ class Option:
 
             opt1, opt2, opt3 = Option(1), Option(2), Option(None)
 
-            opt1.and_(opt2).is_some()
-            True
+            assert opt1.and_(opt2).is_some()
 
-            opt1.and_(opt3).is_none()
-            True
+            assert opt1.and_(opt3).is_none()
 
-            opt3.and_(opt1).is_none()
-            True
+            assert opt3.and_(opt1).is_none()
         """
         if self.is_some() and other.is_some():
             return other
@@ -324,13 +298,33 @@ class Option:
 
 
     def and_then(self, f: Callable):
+        """
+        Applies a function to the value of a non-null Option, otherwise
+        returns Option(None)
+
+            opt = Option(5)
+            assert opt.and_then(lambda x: x+1) == Option(6)
+
+            opt = Option(None)
+            assert opt.and_then(lambda x: x+1).is_none()
+        """
         if not self.is_some():
             return Option(None)
         else:
             return Option(f(self.value))
 
 
-    def filter(self, predicate):
+    def filter(self, predicate: Union[Callable, None]):
+        """
+        Returns Option(None) if self is None. Otherwise calls
+        the predicate on an iterator of one element, self.value
+
+            opt = Option(5)
+            assert opt.filter(lambda x: not x % 2).is_none()
+            assert opt.filter(lambda x: x % 2).is_some()
+
+            assert Option(None).filter(bool).is_none()
+        """
         if self.is_none():
             return Option(None)
         else:
@@ -338,6 +332,17 @@ class Option:
 
 
     def or_(self, other):
+        """
+        Returns self if self is not a None, otherwise returns other
+
+            opt1, opt2, opt3 = Option(1), Option(2), Option(None)
+
+            assert opt1.or_(opt2) == Option(1)
+            assert opt1.or_(opt3) == Option(1)
+
+            assert opt3.or_(opt2) == Option(2)
+            assert opt3.or_(opt3) == Option(None)
+        """
         if self.is_some():
             return self
         else:
@@ -345,6 +350,13 @@ class Option:
 
 
     def or_else(self, f: Callable):
+        """
+        Returns self if self is Some, otherwise calls a function
+
+            opt = Option(5)
+            assert opt.or_else(lambda: 42) == Option(5)
+            assert Option(None).or_else(lambda: 42) == Option(42)
+        """
         if self.is_some():
             return self
         else:
@@ -352,6 +364,16 @@ class Option:
 
 
     def xor(self, other):
+        """
+        Exclusive or for two Option types. Returns the first Some provided
+        both are not Some, otherwise returns None
+
+            opt1, opt2, opt3 = (Option(val) for val in [1, 2, None])
+
+            assert opt1.xor(opt2).is_none()
+            assert opt1.xor(opt3) == Option(1)
+            assert opt3.xor(opt2) == Option(2)
+        """
         tup = (self.is_some(), other.is_some())
         if True in tup and not all(tup):
             return next((opt for opt in (self, other) if opt.is_some()))
@@ -360,19 +382,19 @@ class Option:
 
 
     def insert(self, value):
+        """
+        This is functionally identical to setting the value attribute
+        manually:
+
+            opt = Option(2)
+            opt.value = 3
+
+            opt2 = Option(5)
+            opt2.insert(3)
+
+            assert opt == opt2
+        """
         self.value = value
-
-
-    def get_or_insert(self, value):
-        if self.is_none():
-            self.value = value
-            return value
-
-
-    def get_or_insert_with(self, f: Callable):
-        if self.is_none():
-            self.value = f()
-            return self.value
 
 
     def take(self):
