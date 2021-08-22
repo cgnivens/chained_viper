@@ -203,13 +203,13 @@ class Result:
         Result is an Err[e], returns an empty iterator
 
             r = Result(1)
-            assert r.iter_().next() == Option(1)
+            assert r.iter().next() == Option(1)
 
             e = Result(Exception(1))
-            assert r.iter_().next() == Option(None)
+            assert r.iter().next() == Option(None)
 
             r = Result('abc')
-            assert r.iter_().next() == Option('a')
+            assert r.iter().next() == Option('a')
 
         This is the method recommended for chaining lazy
         operations on a Result, as the iterator will not evaluate them
@@ -225,6 +225,10 @@ class Result:
 
 
     def and_(self, other):
+        """
+        Will return other if both are Ok otherwise
+        returns the first Err
+        """
         if not self.is_ok():
             return self
         elif not other.is_ok():
@@ -234,6 +238,11 @@ class Result:
 
 
     def and_then(self, f: Callable):
+        """
+        Acts as control flow for Ok and Err types,
+        where Ok will have f applied to it and
+        Err will not
+        """
         if not self.is_ok():
             return self
 
@@ -246,6 +255,9 @@ class Result:
 
 
     def or_(self, other):
+        """
+        Returns first Ok or other
+        """
         if self.is_ok():
             return self
         elif other.is_ok():
