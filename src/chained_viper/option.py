@@ -32,6 +32,17 @@ class Option:
 
 
     def __eq__(self, other):
+        """Tests equality between two Options
+
+        Parameters
+        ----------
+        other: Option
+            Another option to compare against
+
+        Returns
+        -------
+        bool
+        """
         return self.value == other.value
 
 
@@ -40,9 +51,36 @@ class Option:
 
 
     def unwrap(self):
-        """
-        Attempts to unwrap the Option into its contained
+        """Attempts to unwrap the Option into its contained
         value. Unwrapping a None will raise a ValueError
+
+        Returns
+        -------
+        value: Any
+            Returns the wrapped value so long as it isn't None
+
+        Raises
+        ------
+        ValueError
+            Only if unwrapping a None value
+
+
+        Examples
+        --------
+        Unwrapping a non-None Option returns the value:
+
+        >>> opt = Option(5)
+        >>> assert opt.unwrap() == 5
+
+
+        Unwrapping a None raises a ValueError
+        >>> opt = Option(None)
+        >>> try:
+        ...     val = opt.unwrap()
+        ... except ValueError:
+        ...     print("Error caught")
+        ...
+        Error caught
         """
         if not self.is_some():
             raise ValueError("Bare 'None' not allowed")
@@ -51,14 +89,20 @@ class Option:
 
 
     def is_some(self):
-        """
-        Checks if the Option is not wrapping None
+        """Checks if the Option is not wrapping None
 
-            opt = Option(5)
-            assert opt.is_some()
+        Returns
+        -------
+        bool
 
-            opt = Option(None)
-            assert not opt.is_some()
+        Examples
+        --------
+
+        >>> opt = Option(5)
+        >>> assert opt.is_some()
+
+        >>> opt = Option(None)
+        >>> assert not opt.is_some()
         """
         return self.value is not None
 
@@ -67,11 +111,17 @@ class Option:
         """
         Checks if the Option is wrapping None
 
-            opt = Option(5)
-            assert not opt.is_none()
+        Returns
+        -------
+        bool
 
-            opt = Option(None)
-            assert opt.is_none()
+        Examples
+        --------
+        >>> opt = Option(5)
+        >>> assert not opt.is_none()
+
+        >>> opt = Option(None)
+        >>> assert opt.is_none()
         """
         return self.value is None
 
@@ -81,8 +131,18 @@ class Option:
         Checks to see if the Option contains an explicit value.
         Similar to equivalence checking against another Option
 
-            opt = Option(5)
-            assert opt.contains(5)
+        Parameters
+        ----------
+        value: Any
+
+        Returns
+        -------
+        bool
+
+        Examples
+        --------
+        >>> opt = Option(5)
+        >>> assert opt.contains(5)
         """
         return self.value == value if self.is_some() else False
 
@@ -93,12 +153,28 @@ class Option:
         raise an Exception with the chosen method otherwise.
         Similar to unwrap except you specify the error message
 
-            opt = Option(5).expect("Error!")
-            assert opt == 5
+        Parameters
+        ----------
+        message: str
+            The message to be displayed in the event that self
+            is a None
 
-            opt = Option(None).expect("Error!")
-            Exception:
-                Error!
+        Raises
+        ------
+        Exception
+
+        Returns
+        -------
+        self.value
+
+        Examples
+        --------
+        >>> opt = Option(5).expect("Error!")
+        >>> assert opt == 5
+
+        >>> opt = Option(None).expect("Error!")
+        Exception:
+            Error!
         """
         if self.is_some():
             return self.value
@@ -112,17 +188,22 @@ class Option:
         a default value. Helpful for avoiding ValueErrors on
         unwrapping a None value
 
-            opt = Option(5)
-            assert opt.unwrap_or(42) == 5
+        Examples
+        --------
 
-            opt = Option(None)
-            assert opt.unwrap_or(42) == 42
+        >>> opt = Option(5)
+        >>> assert opt.unwrap_or(42) == 5
 
-            # Better than this approach
-            try:
-                val = opt.unwrap()
-            except:
-                val = 42
+        >>> opt = Option(None)
+        >>> assert opt.unwrap_or(42) == 42
+
+        # Better than this approach
+        >>> try:
+        ...     val = opt.unwrap()
+        ... except:
+        ...     val = 42
+        ...
+        >>> assert val == 42
 
         """
         return self.value if self.is_some() else default
@@ -133,29 +214,34 @@ class Option:
         Allows for a closure to be passed to handle Nones instead
         of just unwrapping them.
 
-            opt = Option(5)
-            assert opt.unwrap_or_else(lambda: 42) == 5
+        Examples
+        --------
 
-            opt = Option(None)
-            assert opt.unwrap_or_else(lambda: 42) == 42
+        >>> opt = Option(5)
+        >>> assert opt.unwrap_or_else(lambda: 42) == 5
 
-            # Better than this approach
-            try:
-                val = opt.unwrap()
-            except:
-                val = f()
+        >>> opt = Option(None)
+        >>> assert opt.unwrap_or_else(lambda: 42) == 42
+
+        # Replaces this approach
+        >>> try:
+        ...     val = opt.unwrap()
+        ... except:
+        ...     val = f()
+        ...
+        >>> assert val == 42
 
         Note that the closure does not use arguments. If you need your closure
         to take args, use partial function application:
 
-            from functools import partial
+        >>> from functools import partial
 
-            def some_func(a):
-                return a + 1
+        >>> def some_func(a):
+        ...     return a + 1
 
-            f = partial(some_func, a=22)
+        >>> f = partial(some_func, a=22)
 
-            assert Option(None).unwrap_or_else(f) == 23
+        >>> assert Option(None).unwrap_or_else(f) == 23
         """
         return self.value if self.is_some() else f()
 
@@ -165,18 +251,21 @@ class Option:
         Applies a closure/function to the value wrapped in the Option
         if it is not a None, otherwise returns the Option(None).
 
-            opt = Option(5)
-            assert opt.map(lambda x: x + 1) == Option(6)
+        Examples
+        --------
 
-            opt = Option(None)
-            assert opt.map(lambda x: x + 1) == Option(None)
+        >>> opt = Option(5)
+        >>> assert opt.map(lambda x: x + 1) == Option(6)
+
+        >>> opt = Option(None)
+        >>> assert opt.map(lambda x: x + 1) == Option(None)
 
         These are evaluated greedily. For a more lazy evaluation style,
         use the Option.iter() method to transform it into an iterator:
 
-            opt = Option(5).iter()
-            opt = opt.map(lambda x: x + 1) # hasn't evaluated yet
-            opt.next() == Option(6) # evaluates here
+        >>> opt = Option(5).iter()
+        >>> opt = opt.map(lambda x: x + 1) # hasn't evaluated yet
+        >>> opt.next() == Option(6) # evaluates here
         """
         return Option(f(self.value)) if self.is_some() else self
 
@@ -186,11 +275,14 @@ class Option:
         Applies a function to the value of an Option provided it is
         not a None, otherwise returns a default value
 
-            opt = Option(5)
-            assert opt.map_or(lambda x: x + 1, 42) == Option(6)
+        Examples
+        --------
 
-            opt = Option(None)
-            assert opt.map_or(lambda x: x + 1, 42) == Option(42)
+        >>> opt = Option(5)
+        >>> assert opt.map_or(lambda x: x + 1, 42) == Option(6)
+
+        >>> opt = Option(None)
+        >>> assert opt.map_or(lambda x: x + 1, 42) == Option(42)
 
         The function is greedily evaluated
         """
@@ -202,11 +294,14 @@ class Option:
         Applies a function to the value of an Option provided it is
         not a None, otherwise calls a default function
 
-            opt = Option(5)
-            assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(6)
+        Examples
+        --------
 
-            opt = Option(None)
-            assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(42)
+        >>> opt = Option(5)
+        >>> assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(6)
+
+        >>> opt = Option(None)
+        >>> assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(42)
 
         The function and default are greedily evaluated
         """
@@ -218,11 +313,11 @@ class Option:
         Converts an Option<T> into a Result<T>, and a
         None into an Err<T>
 
-            opt = Option(5)
-            assert opt.ok_or(Exception("Bad Value")) == Result(5)
+        >>> opt = Option(5)
+        >>> assert opt.ok_or(Exception("Bad Value")) == Result(5)
 
-            opt = Option(None)
-            assert opt.ok_or(Exception("Bad Value")).is_err()
+        >>> opt = Option(None)
+        >>> assert opt.ok_or(Exception("Bad Value")).is_err()
         """
         return Result(self.value if self.is_some() else e)
 
@@ -232,15 +327,14 @@ class Option:
         Transforms Option<T> into Result<T> if Some otherwise
             calls e which returns Exception<U>
 
-        Example:
+        Examples
+        --------
 
-        ```python
-        my_option = Option(4)
-        assert my_option.ok_or_else(lambda: Exception(5)).unwrap() == 4
+        >>> my_option = Option(4)
+        >>> assert my_option.ok_or_else(lambda: Exception(5)).unwrap() == 4
 
-        my_option = Option(None)
-        assert my_option.ok_or_else(lambda: Exception(5)).is_err()
-        ```
+        >>> my_option = Option(None)
+        >>> assert my_option.ok_or_else(lambda: Exception(5)).is_err()
         """
         return Result(self.value if self.is_some() else e())
 
@@ -251,26 +345,28 @@ class Option:
         value. If the contained value doesn't support iteration, then
         a single-element iterator is created
 
-            my_iter = Option(5).iter()
-            assert my_iter.next() == Option(5)
+        Examples
+        --------
+        >>> my_iter = Option(5).iter()
+        >>> assert my_iter.next() == Option(5)
 
-            # int isn't iterable, so single-element
-            # iterator is exhausted
-            assert my_iter.next() == Option(None)
+        >>> # int isn't iterable, so single-element
+        >>> # iterator is exhausted
+        >>> assert my_iter.next() == Option(None)
 
-            # Iterates over each element in the string
-            my_iter = Option("hello").iter()
-            assert my_iter.next() == Option("h")
+        >>> # Iterates over each element in the string
+        >>> my_iter = Option("hello").iter()
+        >>> assert my_iter.next() == Option("h")
 
         Useful for lazily applying a function to a value in an Option.
         If you want a single-element iterator of iterable types, wrap
         into a single-element tuple:
 
-            my_iter = Option(('hello',)).iter()
-            assert my_iter.next() == Option("hello")
+        >>> my_iter = Option(('hello',)).iter()
+        >>> assert my_iter.next() == Option("hello")
 
-            # Iterator is now empty
-            assert my_iter.next().is_none()
+        >>> # Iterator is now empty
+        >>> assert my_iter.next().is_none()
         """
         if hasattr(self.value, '__iter__'):
             return Iter(iter(self.value))
@@ -283,13 +379,15 @@ class Option:
         Returns other if both self and other are Some, otherwise
         returns Option(None). Useful for control flow:
 
-            opt1, opt2, opt3 = Option(1), Option(2), Option(None)
+        Examples
+        --------
+        >>> opt1, opt2, opt3 = Option(1), Option(2), Option(None)
 
-            assert opt1.and_(opt2).is_some()
+        >>> assert opt1.and_(opt2).is_some()
 
-            assert opt1.and_(opt3).is_none()
+        >>> assert opt1.and_(opt3).is_none()
 
-            assert opt3.and_(opt1).is_none()
+        >>> assert opt3.and_(opt1).is_none()
         """
         if self.is_some() and other.is_some():
             return other
@@ -302,11 +400,13 @@ class Option:
         Applies a function to the value of a non-null Option, otherwise
         returns Option(None)
 
-            opt = Option(5)
-            assert opt.and_then(lambda x: x+1) == Option(6)
+        Examples
+        --------
+        >>> opt = Option(5)
+        >>> assert opt.and_then(lambda x: x+1) == Option(6)
 
-            opt = Option(None)
-            assert opt.and_then(lambda x: x+1).is_none()
+        >>> opt = Option(None)
+        >>> assert opt.and_then(lambda x: x+1).is_none()
         """
         if not self.is_some():
             return Option(None)
@@ -319,11 +419,13 @@ class Option:
         Returns Option(None) if self is None. Otherwise calls
         the predicate on an iterator of one element, self.value
 
-            opt = Option(5)
-            assert opt.filter(lambda x: not x % 2).is_none()
-            assert opt.filter(lambda x: x % 2).is_some()
+        Examples
+        --------
+        >>> opt = Option(5)
+        >>> assert opt.filter(lambda x: not x % 2).is_none()
+        >>> assert opt.filter(lambda x: x % 2).is_some()
 
-            assert Option(None).filter(bool).is_none()
+        >>> assert Option(None).filter(bool).is_none()
         """
         if self.is_none():
             return Option(None)
@@ -335,13 +437,16 @@ class Option:
         """
         Returns self if self is not a None, otherwise returns other
 
-            opt1, opt2, opt3 = Option(1), Option(2), Option(None)
+        Examples
+        --------
 
-            assert opt1.or_(opt2) == Option(1)
-            assert opt1.or_(opt3) == Option(1)
+        >>> opt1, opt2, opt3 = Option(1), Option(2), Option(None)
 
-            assert opt3.or_(opt2) == Option(2)
-            assert opt3.or_(opt3) == Option(None)
+        >>> assert opt1.or_(opt2) == Option(1)
+        >>> assert opt1.or_(opt3) == Option(1)
+
+        >>> assert opt3.or_(opt2) == Option(2)
+        >>> assert opt3.or_(opt3) == Option(None)
         """
         if self.is_some():
             return self
@@ -353,9 +458,12 @@ class Option:
         """
         Returns self if self is Some, otherwise calls a function
 
-            opt = Option(5)
-            assert opt.or_else(lambda: 42) == Option(5)
-            assert Option(None).or_else(lambda: 42) == Option(42)
+        Examples
+        --------
+
+        >>> opt = Option(5)
+        >>> assert opt.or_else(lambda: 42) == Option(5)
+        >>> assert Option(None).or_else(lambda: 42) == Option(42)
         """
         if self.is_some():
             return self
@@ -368,11 +476,14 @@ class Option:
         Exclusive or for two Option types. Returns the first Some provided
         both are not Some, otherwise returns None
 
-            opt1, opt2, opt3 = (Option(val) for val in [1, 2, None])
+        Examples
+        --------
 
-            assert opt1.xor(opt2).is_none()
-            assert opt1.xor(opt3) == Option(1)
-            assert opt3.xor(opt2) == Option(2)
+        >>> opt1, opt2, opt3 = (Option(val) for val in [1, 2, None])
+
+        >>> assert opt1.xor(opt2).is_none()
+        >>> assert opt1.xor(opt3) == Option(1)
+        >>> assert opt3.xor(opt2) == Option(2)
         """
         tup = (self.is_some(), other.is_some())
         if True in tup and not all(tup):
@@ -384,15 +495,18 @@ class Option:
     def insert(self, value):
         """
         This is functionally identical to setting the value attribute
-        manually:
+        manually
 
-            opt = Option(2)
-            opt.value = 3
+        Examples
+        --------
 
-            opt2 = Option(5)
-            opt2.insert(3)
+        >>> opt = Option(2)
+        >>> opt.value = 3
 
-            assert opt == opt2
+        >>> opt2 = Option(5)
+        >>> opt2.insert(3)
+
+        >>> assert opt == opt2
         """
         self.value = value
 
@@ -402,11 +516,14 @@ class Option:
         Strips the value from self and returns a new Option, changing
         self to a None
 
-            opt = Option(5)
-            assert opt.take() == Option(5)
+        Examples
+        --------
 
-            # original option is now None
-            assert opt.is_none()
+        >>> opt = Option(5)
+        >>> assert opt.take() == Option(5)
+
+        >>> # original option is now None
+        >>> assert opt.is_none()
         """
         new_ = Option(self.value)
         self.value = None
@@ -418,10 +535,13 @@ class Option:
         Replaces self.value with a new value, returning
         an Option of the original value
 
-            opt = Option(5)
-            assert opt.replace(6) == Option(5)
+        Examples
+        --------
 
-            assert opt == Option(6)
+        >>> opt = Option(5)
+        >>> assert opt.replace(6) == Option(5)
+
+        >>> assert opt == Option(6)
         """
         new_ = Option(self.value)
         self.value = value
@@ -433,10 +553,13 @@ class Option:
         Create an Option of a tuple of the two contained values, provided
         self and other are not None. Otherwise returns Option(None)
 
-            opt1, opt2, opt3 = Option(1), Option(2), Option(None)
+        Examples
+        --------
 
-            assert opt1.zip(opt2) == Option((1, 2))
-            assert opt1.zip(opt3).is_none()
+        >>> opt1, opt2, opt3 = Option(1), Option(2), Option(None)
+
+        >>> assert opt1.zip(opt2) == Option((1, 2))
+        >>> assert opt1.zip(opt3).is_none()
         """
         if self.is_none() or other.is_none():
             return Option(None)
