@@ -94,10 +94,10 @@ class Option:
         Returns
         -------
         bool
+            True if self.value is not None, otherwise False
 
         Examples
         --------
-
         >>> opt = Option(5)
         >>> assert opt.is_some()
 
@@ -108,12 +108,12 @@ class Option:
 
 
     def is_none(self):
-        """
-        Checks if the Option is wrapping None
+        """Checks if the Option is wrapping None
 
         Returns
         -------
         bool
+            True if self.value is None, otherwise False
 
         Examples
         --------
@@ -127,8 +127,8 @@ class Option:
 
 
     def contains(self, value):
-        """
-        Checks to see if the Option contains an explicit value.
+        """Checks to see if the Option contains an explicit value.
+
         Similar to equivalence checking against another Option
 
         Parameters
@@ -148,9 +148,9 @@ class Option:
 
 
     def expect(self, message):
-        """
-        Expects a non-null Option and returns the value. Will
-        raise an Exception with the chosen method otherwise.
+        """Expects a non-null Option and returns the value.
+
+        Will raise an Exception with the chosen method otherwise.
         Similar to unwrap except you specify the error message
 
         Parameters
@@ -161,7 +161,7 @@ class Option:
 
         Raises
         ------
-        Exception
+        Exception(message)
 
         Returns
         -------
@@ -230,7 +230,8 @@ class Option:
 
         Returns
         -------
-        self.value or the output of f()
+        Any
+            self.value or the output of f()
 
         Examples
         --------
@@ -265,7 +266,8 @@ class Option:
 
 
     def map(self, f: Callable):
-        """
+        """Apply a function to an Option[T].
+
         Applies a closure/function to the value wrapped in the Option
         if it is not a None, otherwise returns the Option(None).
 
@@ -276,7 +278,8 @@ class Option:
 
         Returns
         -------
-        Option(U) where f(T) -> U if T is not None
+        Option[U]
+            where f(T) -> U if T is not None
 
         Examples
         --------
@@ -287,8 +290,8 @@ class Option:
         >>> opt = Option(None)
         >>> assert opt.map(lambda x: x + 1) == Option(None)
 
-        These are evaluated greedily. For a more lazy evaluation style,
-        use the Option.iter() method to transform it into an iterator:
+        # These are evaluated greedily. For a more lazy evaluation style,
+        # use the Option.iter() method to transform it into an iterator:
 
         >>> opt = Option(5).iter()
         >>> opt = opt.map(lambda x: x + 1) # hasn't evaluated yet
@@ -298,7 +301,8 @@ class Option:
 
 
     def map_or(self, f: Callable, default):
-        """
+        """Apply function or return a default on an Option[T].
+
         Applies a function to the value of an Option provided it is
         not a None, otherwise returns a default value
 
@@ -317,7 +321,8 @@ class Option:
 
 
     def map_or_else(self, f: Callable, default: Callable):
-        """
+        """Apply function or call default closure on Option[T].
+        
         Applies a function to the value of an Option provided it is
         not a None, otherwise calls a default function
 
