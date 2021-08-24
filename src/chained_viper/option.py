@@ -188,6 +188,15 @@ class Option:
         a default value. Helpful for avoiding ValueErrors on
         unwrapping a None value
 
+        Parameters
+        ----------
+        default: Any
+            Any value to be returned if self.is_none()
+
+        Returns
+        -------
+        self.value or default
+
         Examples
         --------
 
@@ -213,6 +222,15 @@ class Option:
         """
         Allows for a closure to be passed to handle Nones instead
         of just unwrapping them.
+
+        Parameters
+        ----------
+        f: Callable
+            Any function that takes no arguments
+
+        Returns
+        -------
+        self.value or the output of f()
 
         Examples
         --------
@@ -250,6 +268,15 @@ class Option:
         """
         Applies a closure/function to the value wrapped in the Option
         if it is not a None, otherwise returns the Option(None).
+
+        Parameters
+        ----------
+        f: Callable
+            Single argument function to be applied to self.value
+
+        Returns
+        -------
+        Option(U) where f(T) -> U if T is not None
 
         Examples
         --------
@@ -296,7 +323,6 @@ class Option:
 
         Examples
         --------
-
         >>> opt = Option(5)
         >>> assert opt.map_or(lambda x: x + 1, lambda: 42) == Option(6)
 
@@ -313,6 +339,8 @@ class Option:
         Converts an Option<T> into a Result<T>, and a
         None into an Err<T>
 
+        Examples
+        --------
         >>> opt = Option(5)
         >>> assert opt.ok_or(Exception("Bad Value")) == Result(5)
 
@@ -377,7 +405,7 @@ class Option:
     def and_(self, other):
         """
         Returns other if both self and other are Some, otherwise
-        returns Option(None). Useful for control flow:
+        returns Option(None). Useful for control flow
 
         Examples
         --------
@@ -419,6 +447,18 @@ class Option:
         Returns Option(None) if self is None. Otherwise calls
         the predicate on an iterator of one element, self.value
 
+        Parameters
+        ----------
+        predicate: Union[Callable, None]
+            Either a function that will return a boolean
+            or None which will default to the bool() function
+
+        Returns
+        -------
+        Option[T]
+            T is either None or the contained value if predicate
+            evaluates to True
+
         Examples
         --------
         >>> opt = Option(5)
@@ -436,6 +476,16 @@ class Option:
     def or_(self, other):
         """
         Returns self if self is not a None, otherwise returns other
+
+        Parameters
+        ----------
+        other: Option[U]
+
+        Returns
+        -------
+        Option[T]
+            Where T is either the first non-null wrapped value
+            or None
 
         Examples
         --------
@@ -458,6 +508,16 @@ class Option:
         """
         Returns self if self is Some, otherwise calls a function
 
+        Parameters
+        ----------
+        f: Callable
+
+        Returns
+        -------
+        Option[T]
+            T is either self.value if self.is_some() or the result
+            of f()
+
         Examples
         --------
 
@@ -475,6 +535,14 @@ class Option:
         """
         Exclusive or for two Option types. Returns the first Some provided
         both are not Some, otherwise returns None
+
+        Parameters
+        ----------
+        other: Option[T]
+
+        Returns
+        -------
+        Option[T]
 
         Examples
         --------
@@ -497,9 +565,13 @@ class Option:
         This is functionally identical to setting the value attribute
         manually
 
+        Parameters
+        ----------
+        value: Any
+
         Examples
         --------
-
+        >>> # These two code snippets are functionally identical
         >>> opt = Option(2)
         >>> opt.value = 3
 
@@ -515,6 +587,10 @@ class Option:
         """
         Strips the value from self and returns a new Option, changing
         self to a None
+
+        Returns
+        -------
+        Option[T]
 
         Examples
         --------
@@ -535,6 +611,15 @@ class Option:
         Replaces self.value with a new value, returning
         an Option of the original value
 
+        Parameters
+        ----------
+        value: Any
+
+        Returns
+        -------
+        Option[T]
+            Where T is the original value wrapped by self
+
         Examples
         --------
 
@@ -552,6 +637,14 @@ class Option:
         """
         Create an Option of a tuple of the two contained values, provided
         self and other are not None. Otherwise returns Option(None)
+
+        Parameters
+        ----------
+        other: Option[U]
+
+        Returns
+        -------
+        Option[(T, U)]
 
         Examples
         --------
