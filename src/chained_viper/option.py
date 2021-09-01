@@ -56,7 +56,7 @@ class Option:
 
         Returns
         -------
-        value: Any
+        value : Any
             Returns the wrapped value so long as it isn't None
 
         Raises
@@ -128,12 +128,11 @@ class Option:
 
     def contains(self, value):
         """Checks to see if the Option contains an explicit value.
-
         Similar to equivalence checking against another Option
 
         Parameters
         ----------
-        value: Any
+        value : Any
 
         Returns
         -------
@@ -149,19 +148,17 @@ class Option:
 
     def expect(self, message):
         """Expects a non-null Option and returns the value.
-
         Will raise an Exception with the chosen method otherwise.
         Similar to unwrap except you specify the error message
 
         Parameters
         ----------
-        message: str
-            The message to be displayed in the event that self
-            is a None
+        message : str
+            The message to be displayed in the event that self is None
 
         Raises
         ------
-        Exception(message)
+        Exception
 
         Returns
         -------
@@ -173,8 +170,7 @@ class Option:
         >>> assert opt == 5
 
         >>> opt = Option(None).expect("Error!")
-        Exception:
-            Error!
+        Exception: Error!
         """
         if self.is_some():
             return self.value
@@ -183,14 +179,14 @@ class Option:
 
 
     def unwrap_or(self, default):
-        """
-        Unwraps an Option if it is_some(), otherwise return
-        a default value. Helpful for avoiding ValueErrors on
+        """Unwraps an Option if it is_some(), otherwise return a default value.
+
+        Helpful for avoiding ValueErrors on
         unwrapping a None value
 
         Parameters
         ----------
-        default: Any
+        default : Any
             Any value to be returned if self.is_none()
 
         Returns
@@ -199,7 +195,6 @@ class Option:
 
         Examples
         --------
-
         >>> opt = Option(5)
         >>> assert opt.unwrap_or(42) == 5
 
@@ -219,13 +214,14 @@ class Option:
 
 
     def unwrap_or_else(self, f: Callable):
-        """
+        """Unwrap value or apply a closure
+
         Allows for a closure to be passed to handle Nones instead
         of just unwrapping them.
 
         Parameters
         ----------
-        f: Callable
+        f : Callable
             Any function that takes no arguments
 
         Returns
@@ -302,7 +298,6 @@ class Option:
 
     def map_or(self, f: Callable, default):
         """Apply function or return a default on an Option[T].
-
         Applies a function to the value of an Option provided it is
         not a None, otherwise returns a default value
 
@@ -322,7 +317,7 @@ class Option:
 
     def map_or_else(self, f: Callable, default: Callable):
         """Apply function or call default closure on Option[T].
-        
+
         Applies a function to the value of an Option provided it is
         not a None, otherwise calls a default function
 
@@ -340,9 +335,10 @@ class Option:
 
 
     def ok_or(self, e: Exception):
-        """
-        Converts an Option<T> into a Result<T>, and a
-        None into an Err<T>
+        """Convert an Option to a Result
+
+        Converts an Option<T> into a Result<T>,
+        and a None into an Err<T>
 
         Examples
         --------
@@ -356,13 +352,13 @@ class Option:
 
 
     def ok_or_else(self, e: Callable):
-        """
-        Transforms Option<T> into Result<T> if Some otherwise
-            calls e which returns Exception<U>
+        """Convert an Option to a Result or call a function
+
+        Transforms Option<T> into Result<T> if Some,
+        otherwise returns Exception<U>
 
         Examples
         --------
-
         >>> my_option = Option(4)
         >>> assert my_option.ok_or_else(lambda: Exception(5)).unwrap() == 4
 
@@ -373,10 +369,15 @@ class Option:
 
 
     def iter(self):
-        """
+        """Returns an Iterator over the wrapped value.
+
         Transforms an Option into an Iterator over its contained
         value. If the contained value doesn't support iteration, then
         a single-element iterator is created
+
+        Returns
+        -------
+        Iterator
 
         Examples
         --------
@@ -408,9 +409,14 @@ class Option:
 
 
     def and_(self, other):
-        """
+        """Returns other if both self and other are some else None
+
         Returns other if both self and other are Some, otherwise
         returns Option(None). Useful for control flow
+
+        Returns
+        -------
+        Option
 
         Examples
         --------
@@ -429,9 +435,7 @@ class Option:
 
 
     def and_then(self, f: Callable):
-        """
-        Applies a function to the value of a non-null Option, otherwise
-        returns Option(None)
+        """Applies a function to the value of a non-null Option, otherwise returns Option(None)
 
         Examples
         --------
@@ -448,7 +452,8 @@ class Option:
 
 
     def filter(self, predicate: Union[Callable, None]):
-        """
+        """Applies predicate on the value.
+
         Returns Option(None) if self is None. Otherwise calls
         the predicate on an iterator of one element, self.value
 
@@ -479,12 +484,11 @@ class Option:
 
 
     def or_(self, other):
-        """
-        Returns self if self is not a None, otherwise returns other
+        """Returns self if self is not a None, otherwise returns other
 
         Parameters
         ----------
-        other: Option[U]
+        other : Option[U]
 
         Returns
         -------
@@ -494,7 +498,6 @@ class Option:
 
         Examples
         --------
-
         >>> opt1, opt2, opt3 = Option(1), Option(2), Option(None)
 
         >>> assert opt1.or_(opt2) == Option(1)
@@ -515,7 +518,7 @@ class Option:
 
         Parameters
         ----------
-        f: Callable
+        f : Callable
 
         Returns
         -------
@@ -537,13 +540,14 @@ class Option:
 
 
     def xor(self, other):
-        """
-        Exclusive or for two Option types. Returns the first Some provided
+        """Exclusive or for two Option types.
+
+        Returns the first Some provided
         both are not Some, otherwise returns None
 
         Parameters
         ----------
-        other: Option[T]
+        other : Option[T]
 
         Returns
         -------
@@ -566,7 +570,8 @@ class Option:
 
 
     def insert(self, value):
-        """
+        """Sets the value on self
+
         This is functionally identical to setting the value attribute
         manually
 
