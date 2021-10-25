@@ -1,5 +1,14 @@
 from __future__ import annotations
-from typing import Callable, Union, Any, Iterator, Generator, Tuple, TypeVar, Container
+from typing import (
+    Callable,
+    Union,
+    Any,
+    Iterator,
+    Generator,
+    Tuple,
+    TypeVar,
+    Container
+)
 from enum import Enum
 from copy import deepcopy
 import sys

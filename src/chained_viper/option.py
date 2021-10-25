@@ -1,5 +1,14 @@
 from __future__ import annotations
-from typing import Callable, Union, Any, Iterator, Generator, Tuple, TypeVar, Container
+from typing import (
+    Callable,
+    Union,
+    Any,
+    Iterator,
+    Generator,
+    Tuple,
+    TypeVar,
+    Container
+)
 from enum import Enum
 from copy import deepcopy
 from .utils import consume
@@ -51,7 +60,7 @@ class Option:
         return f'Option.Some({self.value})' if self.is_some() else 'Option.None'
 
 
-    def unwrap(self):
+    def unwrap(self) -> Any:
         """Attempts to unwrap the Option into its contained
         value. Unwrapping a None will raise a ValueError
 
@@ -89,7 +98,7 @@ class Option:
         return self.value
 
 
-    def is_some(self):
+    def is_some(self) -> bool:
         """Checks if the Option is not wrapping None
 
         Returns
@@ -108,7 +117,7 @@ class Option:
         return self.value is not None
 
 
-    def is_none(self):
+    def is_none(self) -> bool:
         """Checks if the Option is wrapping None
 
         Returns
@@ -127,7 +136,7 @@ class Option:
         return self.value is None
 
 
-    def contains(self, value):
+    def contains(self, value: Any) -> bool:
         """Checks to see if the Option contains an explicit value.
         Similar to equivalence checking against another Option
 
@@ -147,7 +156,7 @@ class Option:
         return self.value == value if self.is_some() else False
 
 
-    def expect(self, message):
+    def expect(self, message: str) -> Any:
         """Expects a non-null Option and returns the value.
         Will raise an Exception with the chosen method otherwise.
         Similar to unwrap except you specify the error message
@@ -179,7 +188,7 @@ class Option:
             raise Exception(message)
 
 
-    def unwrap_or(self, default):
+    def unwrap_or(self, default: Any) -> Any:
         """Unwraps an Option if it is_some(), otherwise return a default value.
 
         Helpful for avoiding ValueErrors on
@@ -214,7 +223,7 @@ class Option:
         return self.value if self.is_some() else default
 
 
-    def unwrap_or_else(self, f: Callable):
+    def unwrap_or_else(self, f: Callable) -> Any:
         """Unwrap value or apply a closure
 
         Allows for a closure to be passed to handle Nones instead
@@ -262,7 +271,7 @@ class Option:
         return self.value if self.is_some() else f()
 
 
-    def map(self, f: Callable):
+    def map(self, f: Callable) -> Option:
         """Apply a function to an Option[T].
 
         Applies a closure/function to the value wrapped in the Option
@@ -297,7 +306,7 @@ class Option:
         return Option(f(self.value)) if self.is_some() else self
 
 
-    def map_or(self, f: Callable, default):
+    def map_or(self, f: Callable, default) -> Option:
         """Apply function or return a default on an Option[T].
         Applies a function to the value of an Option provided it is
         not a None, otherwise returns a default value
@@ -316,7 +325,7 @@ class Option:
         return Option(f(self.value) if self.is_some() else default)
 
 
-    def map_or_else(self, f: Callable, default: Callable):
+    def map_or_else(self, f: Callable, default: Callable) -> Option:
         """Apply function or call default closure on Option[T].
 
         Applies a function to the value of an Option provided it is
@@ -335,7 +344,7 @@ class Option:
         return Option(f(self.value) if self.is_some() else default())
 
 
-    def ok_or(self, e: Exception):
+    def ok_or(self, e: Exception) -> Result:
         """Convert an Option to a Result
 
         Converts an Option<T> into a Result<T>,
@@ -352,7 +361,7 @@ class Option:
         return Result(self.value if self.is_some() else e)
 
 
-    def ok_or_else(self, e: Callable):
+    def ok_or_else(self, e: Callable) -> Result:
         """Convert an Option to a Result or call a function
 
         Transforms Option<T> into Result<T> if Some,
@@ -369,7 +378,7 @@ class Option:
         return Result(self.value if self.is_some() else e())
 
 
-    def iter(self):
+    def iter(self) -> Iter:
         """Returns an Iterator over the wrapped value.
 
         Transforms an Option into an Iterator over its contained
@@ -409,7 +418,7 @@ class Option:
             return Iter((val for val in (self.value,)))
 
 
-    def and_(self, other):
+    def and_(self, other) -> Option:
         """Returns other if both self and other are some else None
 
         Returns other if both self and other are Some, otherwise
@@ -435,7 +444,7 @@ class Option:
             return Option(None)
 
 
-    def and_then(self, f: Callable):
+    def and_then(self, f: Callable) -> Option:
         """Applies a function to the value of a non-null Option, otherwise returns Option(None)
 
         Examples
@@ -452,7 +461,7 @@ class Option:
             return Option(f(self.value))
 
 
-    def filter(self, predicate: Union[Callable, None]):
+    def filter(self, predicate: Union[Callable, None]) -> Option:
         """Applies predicate on the value.
 
         Returns Option(None) if self is None. Otherwise calls
@@ -484,7 +493,7 @@ class Option:
             return Option(next(filter(predicate, (self.value,)), None))
 
 
-    def or_(self, other):
+    def or_(self, other) -> Option:
         """Returns self if self is not a None, otherwise returns other
 
         Parameters
@@ -513,7 +522,7 @@ class Option:
             return other
 
 
-    def or_else(self, f: Callable):
+    def or_else(self, f: Callable) -> Option:
         """
         Returns self if self is Some, otherwise calls a function
 
@@ -540,7 +549,7 @@ class Option:
             return Option(f())
 
 
-    def xor(self, other):
+    def xor(self, other) -> Option:
         """Exclusive or for two Option types.
 
         Returns the first Some provided
@@ -594,7 +603,7 @@ class Option:
         self.value = value
 
 
-    def take(self):
+    def take(self) -> Option:
         """
         Strips the value from self and returns a new Option, changing
         self to a None
@@ -617,7 +626,7 @@ class Option:
         return new_
 
 
-    def replace(self, value):
+    def replace(self, value) -> Option:
         """
         Replaces self.value with a new value, returning
         an Option of the original value
@@ -644,7 +653,7 @@ class Option:
         return new_
 
 
-    def zip(self, other):
+    def zip(self, other) -> Option:
         """
         Create an Option of a tuple of the two contained values, provided
         self and other are not None. Otherwise returns Option(None)
