@@ -1,4 +1,4 @@
-
+from __future__ import annotations
 from typing import Callable, Union, Any, Iterator, Generator, Tuple, TypeVar, Container
 from enum import Enum
 from copy import deepcopy
@@ -6,13 +6,6 @@ from .utils import consume
 from itertools import islice
 from functools import partial, reduce
 from collections import deque
-
-
-T = TypeVar('T')
-Option = T
-
-
-Iter = TypeVar('Iter', Iterator, Generator)
 
 
 class Iter:
