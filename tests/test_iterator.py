@@ -131,7 +131,6 @@ def test_peek(range_iterator):
 
 def test_nth(range_iterator):
     val = range_iterator.nth(4)
-    print(val)
     assert val == Option(3)
 
     val = Iter('abcd').nth(3)
